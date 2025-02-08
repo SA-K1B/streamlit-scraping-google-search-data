@@ -32,14 +32,6 @@ def get_google_links(query, num_pages=1):
             if cite.text:
                 links.append(cite.text)
         print(links)
-        # for result in search_results:
-        #     all_links.append(result.get_attribute("href"))
-        # next_button = driver.find_elements(By.ID, "pnnext")
-        # if next_button:
-        #     next_button[0].click()
-        #     time.sleep(2)
-        # else:
-        #     break
     st.text("Finished")
     driver.quit()
     return links
@@ -55,9 +47,9 @@ if st.button("Search") and query:
         cleaned_links=[]
         for link in links:
           if link:
-           # Parse the URL and extract only the base URL (scheme + domain)
-             parsed_url = urlparse(link.split(' › ')[0])  # Split at ' › ' and parse the base URL
-             base_url = parsed_url.scheme + "://" + parsed_url.netloc  # Form the base URL
+          
+             parsed_url = urlparse(link.split(' › ')[0])  the base URL
+             base_url = parsed_url.scheme + "://" + parsed_url.netloc base URL
              cleaned_links.append(base_url)
         # print(links)
         df = pd.DataFrame({"Links": cleaned_links})
