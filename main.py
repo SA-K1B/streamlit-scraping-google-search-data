@@ -4,6 +4,9 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
+from selenium.webdriver.common.action_chains import ActionChains
+from urllib.parse import urlparse
+
 
 def get_google_links(query, num_pages=1):
     options = webdriver.ChromeOptions()
@@ -16,11 +19,18 @@ def get_google_links(query, num_pages=1):
     search_box.send_keys(Keys.RETURN)
     time.sleep(50)  # Wait for results to load
     # st.text("Hello")
-    all_links = []
+    links = []
     for _ in range(num_pages):
-        search_results = driver.find_elements(By.CSS_SELECTOR, "cite.qLRx3b.tjvcx.GvPZzd.cHaqb")
-        print(search_results)
-        links = [cite.text for cite in search_results]
+        # <cite class="tjvcx GvPZzd cHaqb" role="text">https://www.startech.com.bd</cite>
+        search_results = driver.find_elements(By.CSS_SELECTOR, ".qLRx3b.tjvcx.GvPZzd.cHaqb")
+        search_results2 = driver.find_elements(By.CSS_SELECTOR, ".tjvcx.GvPZzd.cHaqb")
+        # print(search_results)
+        for cite in search_results:
+            if cite.text:
+                links.append(cite.text)
+        for cite in search_results2:
+            if cite.text:
+                links.append(cite.text)
         print(links)
         # for result in search_results:
         #     all_links.append(result.get_attribute("href"))
@@ -42,6 +52,13 @@ if st.button("Search") and query:
     with st.spinner("Fetching results..."):
         # get_google_links(query)
         links = get_google_links(query)
-        print(links)
-        df = pd.DataFrame({"Links": links})
+        cleaned_links=[]
+        for link in links:
+          if link:
+           # Parse the URL and extract only the base URL (scheme + domain)
+             parsed_url = urlparse(link.split(' › ')[0])  # Split at ' › ' and parse the base URL
+             base_url = parsed_url.scheme + "://" + parsed_url.netloc  # Form the base URL
+             cleaned_links.append(base_url)
+        # print(links)
+        df = pd.DataFrame({"Links": cleaned_links})
         st.table(df)
